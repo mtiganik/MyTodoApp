@@ -59,15 +59,18 @@ namespace WebApp.Controllers
         }
 
         // POST: Todos/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Title,Description,DueDate,Status")] Todo todo)
         {
             if (ModelState.IsValid)
             {
+                if(todo.DueDate < DateTime.Now)
+                {
+                    throw new InvalidOperationException("DueDate cannot be in the past.");
+                }
                 todo.Id = Guid.NewGuid();
+                todo.DueDate = todo.DueDate.ToUniversalTime();
                 _context.Add(todo);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -119,6 +122,7 @@ namespace WebApp.Controllers
             {
                 try
                 {
+                    todo.DueDate = todo.DueDate.ToUniversalTime();
                     _context.Update(todo);
                     await _context.SaveChangesAsync();
                 }
@@ -177,5 +181,7 @@ namespace WebApp.Controllers
         }
     }
 }
+
+
 
 
