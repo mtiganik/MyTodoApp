@@ -20,9 +20,44 @@ namespace WebApp.Controllers
         }
 
         // GET: Todos
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? searchKeyword, string? statusFilter, string? sortBy)
         {
-            return View(await _context.Todos.ToListAsync());
+            var tasksQuery = _context.Todos.AsQueryable();
+            if (!string.IsNullOrEmpty(searchKeyword))
+            {
+                var lowerSearch = searchKeyword.ToLower();
+                tasksQuery = tasksQuery.Where(t => t.Title!.ToLower().Contains(lowerSearch)
+                || t.Description!.ToLower().Contains(lowerSearch));
+            }
+            if (!string.IsNullOrEmpty(statusFilter))
+            {
+                if (Enum.TryParse(typeof(Status), statusFilter, out var status))
+                {
+                    tasksQuery = tasksQuery.Where(t => t.Status == (Status)status);
+                }
+            }
+            switch (sortBy)
+            {
+                case "DueDate":
+                    tasksQuery = tasksQuery.OrderBy(t => t.DueDate);
+                    break;
+                case "Status":
+                    tasksQuery = tasksQuery.OrderBy(t => t.Status);
+                    break;
+                default:
+                    tasksQuery = tasksQuery.OrderBy(t => t.Title); // Default sort by Title
+                    break;
+            }
+            var viewModel = new TodoFilterViewModel
+            {
+                SearchKeyword = searchKeyword,
+                StatusFilter = statusFilter,
+                SortBy = sortBy,
+                Todos = await tasksQuery.ToListAsync()
+            };
+
+
+            return View(viewModel);
         }
 
         // GET: Todos/Details/5
@@ -181,7 +216,4 @@ namespace WebApp.Controllers
         }
     }
 }
-
-
-
 
