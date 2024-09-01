@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Domain;
+using WebApp.ViewModels;
 
 namespace WebApp.Controllers
 {
@@ -45,7 +46,16 @@ namespace WebApp.Controllers
         // GET: Todos/Create
         public IActionResult Create()
         {
-            return View();
+            var model = new TodoViewModel
+            {
+                StatusList = Enum.GetValues(typeof(Status)).Cast<Status>()
+                .Select(s => new SelectListItem
+                {
+                    Text = s.ToString(),
+                    Value = s.ToString()
+                }).ToList()
+            };
+            return View(model);
         }
 
         // POST: Todos/Create
@@ -78,7 +88,19 @@ namespace WebApp.Controllers
             {
                 return NotFound();
             }
-            return View(todo);
+            var viewModel = new TodoViewModel
+            {
+                Todo = todo,
+                StatusList = Enum.GetValues(typeof(Status))
+                            .Cast<Status>()
+                            .Select(s => new SelectListItem
+                            {
+                                Text = s.ToString(),
+                                Value = s.ToString(),
+                                Selected = s == todo.Status
+                            })
+            };
+            return View(viewModel);
         }
 
         // POST: Todos/Edit/5
@@ -155,3 +177,5 @@ namespace WebApp.Controllers
         }
     }
 }
+
+
