@@ -1,5 +1,12 @@
+using Microsoft.EntityFrameworkCore;
+using Domain;
+
 var builder = WebApplication.CreateBuilder(args);
 
+var connectionsString = builder.Configuration.GetConnectionString("DefaultConnection") ??
+    throw new InvalidOperationException("Connection string 'DefaultConnection' not found");
+builder.Services.AddDbContext<AppDbContext>(options =>
+options.UseNpgsql(connectionsString));
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
