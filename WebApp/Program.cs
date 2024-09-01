@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Domain;
+using Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +10,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 options.UseNpgsql(connectionsString));
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<ITodoService, TodoService>();
 
 var app = builder.Build();
 

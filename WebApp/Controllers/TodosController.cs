@@ -7,56 +7,31 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Domain;
 using WebApp.ViewModels;
+using Services;
 
 namespace WebApp.Controllers
 {
     public class TodosController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly ITodoService _service;
 
-        public TodosController(AppDbContext context)
+        public TodosController(ITodoService service)
         {
-            _context = context;
+            _service = service;
         }
 
         // GET: Todos
         public async Task<IActionResult> Index(string? searchKeyword, string? statusFilter, string? sortBy)
         {
-            var tasksQuery = _context.Todos.AsQueryable();
-            if (!string.IsNullOrEmpty(searchKeyword))
-            {
-                var lowerSearch = searchKeyword.ToLower();
-                tasksQuery = tasksQuery.Where(t => t.Title!.ToLower().Contains(lowerSearch)
-                || t.Description!.ToLower().Contains(lowerSearch));
-            }
-            if (!string.IsNullOrEmpty(statusFilter))
-            {
-                if (Enum.TryParse(typeof(Status), statusFilter, out var status))
-                {
-                    tasksQuery = tasksQuery.Where(t => t.Status == (Status)status);
-                }
-            }
-            switch (sortBy)
-            {
-                case "DueDate":
-                    tasksQuery = tasksQuery.OrderBy(t => t.DueDate);
-                    break;
-                case "Status":
-                    tasksQuery = tasksQuery.OrderBy(t => t.Status);
-                    break;
-                default:
-                    tasksQuery = tasksQuery.OrderBy(t => t.Title); // Default sort by Title
-                    break;
-            }
+            var todos = await _service.GetAllAsync(searchKeyword, statusFilter, sortBy);
+
             var viewModel = new TodoFilterViewModel
             {
                 SearchKeyword = searchKeyword,
                 StatusFilter = statusFilter,
                 SortBy = sortBy,
-                Todos = await tasksQuery.ToListAsync()
+                Todos = todos
             };
-
-
             return View(viewModel);
         }
 
@@ -68,8 +43,7 @@ namespace WebApp.Controllers
                 return NotFound();
             }
 
-            var todo = await _context.Todos
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var todo = await _service.GetByIdAsync(id);
             if (todo == null)
             {
                 return NotFound();
@@ -100,14 +74,7 @@ namespace WebApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                if(todo.DueDate < DateTime.Now)
-                {
-                    throw new InvalidOperationException("DueDate cannot be in the past.");
-                }
-                todo.Id = Guid.NewGuid();
-                todo.DueDate = todo.DueDate.ToUniversalTime();
-                _context.Add(todo);
-                await _context.SaveChangesAsync();
+                todo = await _service.CreateAsync(todo);
                 return RedirectToAction(nameof(Index));
             }
             return View(todo);
@@ -121,7 +88,7 @@ namespace WebApp.Controllers
                 return NotFound();
             }
 
-            var todo = await _context.Todos.FindAsync(id);
+            var todo = await _service.GetByIdAsync(id);
             if (todo == null)
             {
                 return NotFound();
@@ -157,13 +124,11 @@ namespace WebApp.Controllers
             {
                 try
                 {
-                    todo.DueDate = todo.DueDate.ToUniversalTime();
-                    _context.Update(todo);
-                    await _context.SaveChangesAsync();
+                    todo = await _service.UpdateAsync(todo);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TodoExists(todo.Id))
+                    if (!await _service.TodoExistsAsync(todo.Id))
                     {
                         return NotFound();
                     }
@@ -184,9 +149,8 @@ namespace WebApp.Controllers
             {
                 return NotFound();
             }
+            var todo = await _service.GetByIdAsync(id);
 
-            var todo = await _context.Todos
-                .FirstOrDefaultAsync(m => m.Id == id);
             if (todo == null)
             {
                 return NotFound();
@@ -200,19 +164,15 @@ namespace WebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            var todo = await _context.Todos.FindAsync(id);
-            if (todo != null)
+            try
             {
-                _context.Todos.Remove(todo);
+                await _service.DeleteAsync(id);
             }
-
-            await _context.SaveChangesAsync();
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool TodoExists(Guid id)
-        {
-            return _context.Todos.Any(e => e.Id == id);
         }
     }
 }
