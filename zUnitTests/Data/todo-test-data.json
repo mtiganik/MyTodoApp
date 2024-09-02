@@ -1,0 +1,37 @@
+[
+  {
+    "Id": "92e8f9c8-a8a9-4f33-95fb-fae1776393e7",
+    "Title": "Entity1",
+    "Description": "contains 'foo'",
+    "DueDate": "01.01.2056",
+    "Status": 0
+  },
+  {
+    "Id": "911b761d-a2e7-4b28-ab5c-b2315edfd020",
+    "Title": "Entity2",
+    "Description": "'FOO' uppercase",
+    "DueDate": "01.01.2057",
+    "Status": 0
+  },
+  {
+    "Id": "6a3b98d9-f0b3-4bc2-bf42-92e716a2e16a",
+    "Title": "Entity3",
+    "Description": "Same date, second sort by Title. Should be first with Date search",
+    "DueDate": "01.01.2055",
+    "Status": 1
+  },
+  {
+    "Id": "ee7b8be9-cead-4abd-8968-6c4530067f57",
+    "Title": "Entity4",
+    "Description": "Same date, second sort by Title. Should be second with Date search",
+    "DueDate": "01.01.2055",
+    "Status": 1
+  },
+  {
+    "Id": "069ac0d1-6558-4529-9b74-bdc45d45aeed",
+    "Title": "Entity5",
+    "Description": "only Completed one",
+    "DueDate": "01.01.2058",
+    "Status": 2
+  }
+]

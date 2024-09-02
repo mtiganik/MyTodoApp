@@ -1,0 +1,6 @@
+Id,Title,Description,DueDate,Status
+92e8f9c8-a8a9-4f33-95fb-fae1776393e7,Entity1,"contains ""foo""",01.01.2056,0
+911b761d-a2e7-4b28-ab5c-b2315edfd020,Entity2,"""FOO"" uppercase",01.01.2057,0
+6a3b98d9-f0b3-4bc2-bf42-92e716a2e16a,Entity3,"Same date, second sort by Title. Should be first with Date search",01.01.2055,1
+ee7b8be9-cead-4abd-8968-6c4530067f57,Entity4,"Same date, second sort by Title. Should be second with Date search",01.01.2055,1
+069ac0d1-6558-4529-9b74-bdc45d45aeed,Entity5,only Completed one,01.01.2058,2
