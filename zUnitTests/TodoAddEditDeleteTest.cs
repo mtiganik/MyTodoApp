@@ -75,7 +75,7 @@ namespace zUnitTests
         }
 
 
-        Todo todo1 = new Todo()
+        static Todo todo1 = new Todo()
         {
             Title = "task with future date",
             Description = "bla bla bla",
