@@ -34,7 +34,9 @@ dotnet ef database --project EFCore --startup-project WebApp drop
 ```
 Try step number 2 first and if it is successfull then you are ready to go. If step 2 did not work, delete Migrations folder, check connectionString and start again from step 1. Enjoy.   
 Some pictures about this application:
-![image](https://github.com/user-attachments/assets/88b019c1-5e86-4c71-b132-44cd5b9e677c)
+![03final_view](https://github.com/user-attachments/assets/46b260ba-bcff-4f01-970d-a23f13d44076)
 
-![image](https://github.com/user-attachments/assets/0d41a7b5-c5e2-407c-bf48-d8970c58b17b)
+
+![all-tests-pass](https://github.com/user-attachments/assets/66f96061-07ed-41b7-8e95-269f176b04d5)
+
 
